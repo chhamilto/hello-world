@@ -1,0 +1,10 @@
+#open the file and click on the "raw" link on the right and use that url
+#example:
+
+$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/chhamilto/hello-world/main/test.ps1
+Invoke-Expression $($ScriptFromGitHub.Content)
+
+
+#Since the invoke-webrequest doesn't save the output, it downloads to "memory" - actually to the variable, it is storign the entire webrequest object
+#Then the .Content part of the Invoke-Expression says to run the data inside of .conect inside the object stored in the variable. Still with me
+#Since this all runs in memory and actually isn't running a .ps1 file, no execution policy comes into play, cool!
