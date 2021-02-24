@@ -1,3 +1,3 @@
-function Test-Module {
+function Hello-World {
   write-host "`nHello World"
   }
