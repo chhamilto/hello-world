@@ -1,0 +1,50 @@
+#Ended up not using this function here 
+#function write-DRMMDiag ($messages) {
+#    write-host  '<-Start Diagnostic->'
+#    foreach ($Message in $Messages) { $Message }
+#    write-host '<-End Diagnostic->'
+#} 
+function write-DRRMAlert ($message) {
+    write-host '<-Start Result->'
+    write-host "Status=$message"
+    write-host '<-End Result->'
+}
+
+#$env:CustAdmins = "ex1,ex2,ex3"
+$CustomerPermittedAdmins = $env:CustAdmins.Split(",")
+$InternalPermittedAdmins = @('Administrator','Domain Admins','rAdmin')
+$PermittedAdmins = $InternalPermittedAdmins + $CustomerPermittedAdmins
+write-host 'Permitted Admins:'
+$PermittedAdmins
+write-host `r
+
+write-host 'Members of the local admin group:'
+$members = net localgroup administrators | where {$_ -AND $_ -notmatch "command completed successfully"} | select -skip 4
+$members
+write-host `r             
+
+write-host 'List of unpermitted local admins (if any):'
+$unpermittedadmins = ($members | Where-Object -FilterScript { $_ -notin $permittedadmins })
+$unpermittedadmins
+write-host `r
+
+IF($members | Where-Object -FilterScript { $_ -notin $permittedadmins }){
+    write-host "WARNING: Unapproved local admins detected!"
+    write-DRRMAlert "Unapproved local admins detected!"
+    write-host  '<-Start Diagnostic->'
+        write-host 'List of unpermitted local admins:'
+        $unpermittedadmins
+        write-host `r
+        write-host "Local administrator group members:"
+        $members
+        write-host `r
+        write-host "Permitted Admins:"
+        $permittedadmins
+        write-host '<-End Diagnostic->'
+    exit 1
+    }
+    Else{
+        write-host 'SAFE: No unapproved local admins detected'
+        write-DRRMAlert 'No unapproved local admins detected'
+        exit 0
+        }
